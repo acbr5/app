@@ -9,16 +9,15 @@ function getTitle()
 
 $apiUrl = "https://www.potterapi.com/v1/characters?key={$config['api_key']}";
 
-//hello
 if (isset($_GET['house'])) {
-    $validHouses = ['gryffindor', 'ravenclaw', 'slytherin', 'hufflepuff'];
-
+    $validHouses = $config['validHouses'];
     if (!in_array($_GET['house'], $validHouses)) {
-        exit('Böyle bir ev yok');
+        exit('Böyle bir bina yok');
     }
 
     $apiUrl .= ($_GET['house'] ? "&house=" . ucfirst($_GET['house']) : '');
 }
+
 
 $characters = file_get_contents($apiUrl);
 
@@ -28,11 +27,12 @@ $characters = json_decode($characters, true);
 
 foreach ($characters as $character) {
     $characterDetails[] = [
+        '_id' => $character['_id'],
         'name' => $character['name'],
-        'house' => $character['house'] ?? '',
-        'role' => $character['role'] ?? '',
-        'bloodStatus' => $character['bloodStatus'],
-        'species' => $character['species']
+        'house' => $character['house'] ?? null,
+        'role' => $character['role'] ?? null,
+        'bloodStatus' => $character['bloodStatus'] ?? null,
+        'species' => $character['species'] ?? null
     ];
 }
 
@@ -46,53 +46,53 @@ include 'navbar.php';
 
 ?>
 
-    <div class="pt-5">
+<div class="pt-5">
 
-        <div class="container">
+    <div class="container">
 
-            <section class="jumbotron text-center pt-5 mb-5 bg-white">
-                <div class="container">
-                    <h1 class="jumbotron-heading"><?php echo getTitle(); ?></h1>
-                    <span><?php echo $_GET['house'] ?? '' ?></span>
-                </div>
-            </section>
-
-
-            <div class="bg-white p-5">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Avatar</th>
-                        <th scope="col">İsim</th>
-                        <th scope="col">Ev</th>
-                        <th scope="col">Rol</th>
-                        <th scope="col">Kan Tipi</th>
-                        <th scope="col">Tür</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <?php
-                    $counter = 1;
-                    foreach ($characterDetails as $detail):
-                        if (!isset($_GET['house']) || $_GET['house'] == strtolower($detail['house'])) {
-                            ?>
-                            <tr>
-                                <th scope="row"><?php echo $counter++; ?> </th>
-                                <td><img style=" width: 40%; height: auto;" alt="" class="card-img-top" src="assets/images/characters/<?php echo $detail['name']?>.jpg"></td>
-                                <td><?php echo $detail['name']; ?></td>
-                                <td><?php echo $detail['house']; ?></td>
-                                <td><?php echo $detail['role']; ?></td>
-                                <td><?php echo $detail['bloodStatus']; ?></td>
-                                <td><?php echo $detail['species']; ?></td>
-                            </tr>
-                            <?php
-                        }
-                    endforeach;
-                    ?>
-                    </tbody>
-                </table>
+        <section class="jumbotron text-center pt-5 mb-5 bg-white">
+            <div class="container">
+                <h1 class="jumbotron-heading"><?php echo getTitle(); ?></h1>
+                <?php if(isset($_GET['house'])): ?>
+                    <img class="card-img-top" style="width: 5%" src="/assets/images/houses/<?php echo $_GET['house'] ?>.jpg" alt="<?php echo $_GET['house']; ?>">
+                    <span><?php echo strtoupper($_GET['house']) ?></span>
+                <?php endif; ?>
             </div>
+        </section>
+
+
+        <div class="bg-white p-5">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th scope="col" style="width: 15%">Avatar</th>
+                    <th scope="col" style="width: 15%">Ad</th>
+                    <th scope="col" style="width: 25%">Rol</th>
+                    <th scope="col">Bina</th>
+                    <th scope="col">Kan Durumu</th>
+                    <th scope="col">Tür</th>
+                </tr>
+                </thead>
+                <tbody>
+                <?php
+                foreach ($characterDetails as $detail):
+                ?>
+                    <tr>
+                        <td>
+                            <img style=" width: 50%; height: auto;" alt="" class="card-img-top" src="assets/images/characters/<?php echo $detail['name']?>.jpg">
+                        </td>
+                        <td><?php echo $detail['name'];?></td>
+                        <td><?php echo $detail['role'];?></td>
+                        <td><?php echo $detail['house'];?></td>
+                        <td><?php echo $detail['bloodStatus'];?></td>
+                        <td><?php echo $detail['species'];?></td>
+                    </tr>
+                <?php
+                    endforeach;
+                ?>
+                </tbody>
+            </table>
+
         </div>
     </div>
 
